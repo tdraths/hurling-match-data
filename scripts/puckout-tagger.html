@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hurling Match Tagger</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+  :root{--grass:#1a3a1a;--grass-light:#2d5a2d;--lime:#a8e063;--lime-bright:#c6f135;--gold:#f5c842;--white:#f0f4e8;--muted:#7a9a6a;--panel:#0f1f0f;--panel2:#162616;--red:#e05050;--blue:#5090e0;--orange:#e08830;--purple:#a070e0;--border:#2a4a2a;--team-a:#5090e0;--team-b:#e08830}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--panel);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+  header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--panel2)}
+  header h1{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:var(--lime-bright);white-space:nowrap}
+  .scoreboard{display:flex;align-items:stretch;background:var(--grass);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .score-team{display:flex;flex-direction:column;padding:7px 13px;min-width:145px}
+  .score-team.team-a{border-right:1px solid var(--border)}
+  .score-team-name input{background:none;border:none;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;width:100%;outline:none;cursor:text;margin-bottom:4px}
+  .score-display{display:flex;align-items:center;gap:3px}
+  .score-input{background:var(--panel2);border:1px solid var(--border);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:1.55rem;text-align:center;border-radius:4px;outline:none;width:41px;padding:2px 3px;line-height:1}
+  .score-input.wide{width:49px}
+  .score-input:focus{border-color:var(--lime)}
+  .score-sep{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--muted)}
+  .score-vs{padding:0 11px;display:flex;align-items:center;font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:var(--muted);letter-spacing:2px}
+  .score-diff-badge{padding:0 13px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px solid var(--border)}
+  .diff-val{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;line-height:1;color:var(--muted)}
+  .diff-lbl{font-size:.46rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);white-space:nowrap;margin-top:2px}
+  .header-right{display:flex;gap:9px;align-items:center}
+  .meta-field{display:flex;flex-direction:column;gap:2px}
+  .meta-field label{font-size:.5rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  .meta-field input{background:var(--grass);border:1px solid var(--border);color:var(--white);font-family:'DM Mono',monospace;font-size:.72rem;padding:4px 7px;border-radius:4px;width:108px;outline:none}
+  .meta-field input:focus{border-color:var(--lime)}
+  .count-badges{display:flex;gap:5px}
+  .count-badge{background:var(--grass);border:1px solid var(--border);border-radius:8px;padding:4px 9px;text-align:center}
+  .count-badge .num{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--lime-bright);line-height:1}
+  .count-badge .num.fc{color:var(--purple)}
+  .count-badge .lbl{font-size:.44rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  .main-tabs{display:flex;border-bottom:2px solid var(--border);background:var(--panel2)}
+  .main-tab{flex:1;padding:9px;text-align:center;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted);border:none;background:none;transition:all .15s;border-bottom:3px solid transparent;margin-bottom:-2px}
+  .main-tab:hover{color:var(--white)}
+  .main-tab.ap{color:var(--lime-bright);border-bottom-color:var(--lime-bright)}
+  .main-tab.af{color:var(--purple);border-bottom-color:var(--purple)}
+  main{display:grid;grid-template-columns:1fr 365px;height:calc(100vh - 107px)}
+  .tagger-panel{display:none;flex-direction:column;overflow:hidden}
+  .tagger-panel.active{display:flex}
+  .tagger{padding:12px 17px;display:flex;flex-direction:column;gap:11px;overflow-y:auto;border-right:1px solid var(--border)}
+  .tagger::-webkit-scrollbar{width:4px}
+  .tagger::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+  .st{font-size:.57rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:5px}
+  .team-switcher{display:grid;grid-template-columns:1fr auto 1fr;gap:7px;align-items:center}
+  .team-btn{padding:10px 12px;border-radius:8px;border:2px solid var(--border);background:var(--panel2);color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;cursor:pointer;transition:all .15s;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .team-btn:hover{border-color:var(--white);color:var(--white)}
+  .team-btn.aa{border-color:var(--team-a);background:rgba(80,144,224,.15);color:var(--team-a)}
+  .team-btn.ab{border-color:var(--team-b);background:rgba(224,136,48,.15);color:var(--team-b)}
+  .sw-hint{text-align:center;font-size:.54rem;color:var(--muted);letter-spacing:1px}
+  .edit-banner{background:rgba(245,200,66,.1);border:1px solid var(--gold);border-radius:6px;padding:6px 11px;font-size:.66rem;color:var(--gold);text-align:center;letter-spacing:1px;display:none}
+  .edit-banner.show{display:block}
+  .sr{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .ig{display:flex;flex-direction:column;gap:3px}
+  .ig label{font-size:.54rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  .ig input{background:var(--panel2);border:1px solid var(--border);color:var(--white);font-family:'DM Mono',monospace;font-size:.92rem;padding:6px 9px;border-radius:6px;outline:none;width:100%;text-align:center}
+  .ig input:focus{border-color:var(--lime)}
+  .ig input.left{text-align:left;font-size:.82rem}
+  .bg{display:flex;gap:5px;flex-wrap:wrap}
+  .btn{padding:7px 9px;border-radius:6px;border:1.5px solid var(--border);background:var(--panel2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.68rem;cursor:pointer;transition:all .15s;flex:1;min-width:64px;text-align:center}
+  .btn:hover{border-color:var(--lime);color:var(--white)}
+  .btn.active{border-color:var(--lime-bright);background:rgba(168,224,99,.15);color:var(--lime-bright);font-weight:600}
+  .btn.active.red{border-color:var(--red);background:rgba(224,80,80,.15);color:var(--red)}
+  .btn.active.blue{border-color:var(--blue);background:rgba(80,144,224,.15);color:var(--blue)}
+  .btn.active.orange{border-color:var(--orange);background:rgba(224,136,48,.15);color:var(--orange)}
+  .btn.active.gold{border-color:var(--gold);background:rgba(245,200,66,.15);color:var(--gold)}
+  .btn.active.purple{border-color:var(--purple);background:rgba(160,112,224,.15);color:var(--purple)}
+  .pitch{display:grid;grid-template-rows:repeat(3,1fr);gap:3px;background:var(--grass-light);border:2px solid var(--border);border-radius:8px;padding:4px;aspect-ratio:1.8}
+  .pr{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+  .zb{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:rgba(255,255,255,.4);font-size:.54rem;font-family:'DM Mono',monospace;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;padding:3px;text-align:center;line-height:1.2}
+  .zb:hover{background:rgba(168,224,99,.2);color:var(--white);border-color:var(--lime)}
+  .zb.active{background:rgba(168,224,99,.35);color:var(--lime-bright);border-color:var(--lime-bright)}
+  .fp{display:grid;grid-template-rows:repeat(5,1fr);gap:3px;background:var(--grass-light);border:2px solid var(--border);border-radius:8px;padding:4px;aspect-ratio:1.4}
+  .fpr{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+  .fzb{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);border-radius:3px;color:rgba(255,255,255,.35);font-size:.48rem;font-family:'DM Mono',monospace;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;padding:2px;text-align:center;line-height:1.2}
+  .fzb:hover{background:rgba(160,112,224,.2);color:var(--white);border-color:var(--purple)}
+  .fzb.active{background:rgba(160,112,224,.35);color:var(--purple);border-color:var(--purple)}
+  .pl{display:flex;justify-content:space-between;font-size:.47rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+  .rr{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .rb{padding:10px;border-radius:8px;border:2px solid var(--border);background:var(--panel2);color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;cursor:pointer;transition:all .15s;text-align:center}
+  .rb:hover{border-color:var(--white);color:var(--white)}
+  .rb.yes.active{border-color:var(--lime-bright);background:rgba(168,224,99,.15);color:var(--lime-bright)}
+  .rb.no.active{border-color:var(--red);background:rgba(224,80,80,.15);color:var(--red)}
+  .og{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+  .nag{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+  .ni{background:var(--panel2);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.76rem;padding:6px 9px;border-radius:6px;outline:none;width:100%;resize:none;height:41px}
+  .ni:focus{border-color:var(--lime)}
+  .lb{border:none;color:var(--panel);font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:3px;padding:12px;border-radius:8px;cursor:pointer;transition:all .15s;width:100%}
+  .lb.pl-btn{background:var(--lime-bright)}
+  .lb.pl-btn:hover{background:var(--lime)}
+  .lb.fr-btn{background:var(--purple);color:var(--white)}
+  .lb.fr-btn:hover{background:#8850d0}
+  .lb.editing{background:var(--gold)!important;color:var(--panel)!important}
+  .lb.pulse{animation:pulse .3s ease}
+  @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(.97)}100%{transform:scale(1)}}
+  .cb{background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:.68rem;padding:6px;border-radius:6px;cursor:pointer;transition:all .15s;width:100%;display:none}
+  .cb:hover{border-color:var(--red);color:var(--red)}
+  .cb.show{display:block}
+  .kh{text-align:center;font-size:.52rem;color:var(--muted);letter-spacing:.5px;line-height:1.7}
+  .chain-wrap{background:rgba(198,241,53,.04);border:1px solid rgba(198,241,53,.18);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+  .chain-title{font-size:.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--lime);margin-bottom:2px}
+  .touch-row{display:grid;grid-template-columns:52px 1fr 1fr;gap:5px;align-items:center}
+  .touch-label{font-size:.62rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:var(--muted);text-align:right;padding-right:4px}
+  .touch-row.dimmed{opacity:.3;pointer-events:none}
+  .shot-row{display:grid;grid-template-columns:52px 1fr;gap:5px;align-items:center;margin-top:2px;padding-top:8px;border-top:1px solid var(--border)}
+  .sob{padding:5px 7px;border-radius:5px;border:1.5px solid var(--border);background:var(--panel2);color:var(--muted);font-family:'DM Mono',monospace;font-size:.62rem;cursor:pointer;transition:all .15s;flex:1;min-width:44px;text-align:center}
+  .sob:hover{border-color:var(--lime);color:var(--white)}
+  .sob.active{border-color:var(--lime-bright);background:rgba(168,224,99,.15);color:var(--lime-bright);font-weight:600}
+  .sob.active.gold{border-color:var(--gold);background:rgba(245,200,66,.15);color:var(--gold)}
+  .sob.active.red{border-color:var(--red);background:rgba(224,80,80,.15);color:var(--red)}
+  .sob.active.orange{border-color:var(--orange);background:rgba(224,136,48,.15);color:var(--orange)}
+  .sob.active.blue{border-color:var(--blue);background:rgba(80,144,224,.15);color:var(--blue)}
+  kbd{background:var(--grass);border:1px solid var(--border);border-radius:3px;padding:1px 4px;font-family:'DM Mono',monospace;font-size:.52rem;color:var(--white)}
+  .log-panel{display:flex;flex-direction:column;background:var(--panel2);overflow:hidden}
+  .lh{padding:10px 13px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .lh h2{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--lime);font-size:.92rem}
+  .lh-btns{display:flex;gap:5px}
+  .eb{background:var(--grass);border:1px solid var(--border);color:var(--lime);font-family:'DM Mono',monospace;font-size:.58rem;padding:4px 8px;border-radius:5px;cursor:pointer;transition:all .15s}
+  .eb:hover{border-color:var(--lime-bright);color:var(--lime-bright)}
+  .eb.fe{color:var(--purple)}
+  .eb.fe:hover{border-color:var(--purple)}
+  .lf{display:flex;border-bottom:1px solid var(--border)}
+  .ft{flex:1;padding:6px;text-align:center;cursor:pointer;font-size:.56rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border:none;background:none;transition:all .15s;border-bottom:2px solid transparent}
+  .ft:hover{color:var(--white)}
+  .ft.active{color:var(--lime-bright);border-bottom-color:var(--lime-bright)}
+  .ft.ta.active{color:var(--team-a);border-bottom-color:var(--team-a)}
+  .ft.tb.active{color:var(--team-b);border-bottom-color:var(--team-b)}
+  .ft.tf.active{color:var(--purple);border-bottom-color:var(--purple)}
+  .ll{flex:1;overflow-y:auto;padding:6px 8px;display:flex;flex-direction:column;gap:4px}
+  .ll::-webkit-scrollbar{width:4px}
+  .ll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+  .le{background:var(--grass);border:1px solid var(--border);border-left-width:3px;border-radius:6px;padding:6px 8px;display:grid;grid-template-columns:28px 1fr auto;gap:5px;align-items:start;animation:si .2s ease;position:relative;cursor:pointer;transition:border-color .15s}
+  .le:hover{border-color:var(--lime)}
+  .le.ta-e{border-left-color:var(--team-a)}
+  .le.tb-e{border-left-color:var(--team-b)}
+  .le.fr-e{border-left-color:var(--purple)}
+  .le.en{border-color:var(--gold)!important;background:rgba(245,200,66,.07)}
+  @keyframes si{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+  .en_{font-family:'Bebas Neue',sans-serif;font-size:.86rem;color:var(--muted);line-height:1.2}
+  .ed{display:flex;flex-direction:column;gap:2px}
+  .em{font-size:.67rem;color:var(--white);font-weight:500}
+  .es{font-size:.57rem;color:var(--muted);font-family:'DM Mono',monospace}
+  .etag{font-size:.54rem;font-weight:700;text-transform:uppercase}
+  .etag.a{color:var(--team-a)}
+  .etag.b{color:var(--team-b)}
+  .etag.f{color:var(--purple)}
+  .er{font-family:'Bebas Neue',sans-serif;font-size:.76rem}
+  .er.yes,.er.point{color:var(--lime-bright)}
+  .er.goal{color:var(--gold)}
+  .er.no,.er.wide,.er.short{color:var(--red)}
+  .er.saved,.er.cleared{color:var(--orange)}
+  .db{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--border);cursor:pointer;font-size:.6rem;display:none;transition:color .1s}
+  .le:hover .db{display:block}
+  .db:hover{color:var(--red)}
+  .el{text-align:center;color:var(--muted);font-size:.67rem;margin-top:30px;line-height:1.9}
+  .sb{border-top:1px solid var(--border);padding:8px 11px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+  .sv{text-align:center}
+  .sv .v{font-family:'Bebas Neue',sans-serif;font-size:1.12rem;line-height:1;color:var(--lime)}
+  .sv .v.a{color:var(--team-a)}
+  .sv .v.b{color:var(--team-b)}
+  .sv .v.p{color:var(--purple)}
+  .sv .l{font-size:.44rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);color:var(--panel);font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:2px;padding:7px 17px;border-radius:6px;opacity:0;transition:all .25s;pointer-events:none;z-index:100}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.lime{background:var(--lime-bright)}
+  .toast.gold{background:var(--gold)}
+  .toast.purple{background:var(--purple);color:var(--white)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Match Tagger</h1>
+  <div class="scoreboard">
+    <div class="score-team team-a">
+      <div class="score-team-name"><input id="tnA" value="Team A" oninput="syncNames()"/></div>
+      <div class="score-display">
+        <input class="score-input" id="aG" type="number" value="0" min="0" oninput="updateDiff()"/>
+        <span class="score-sep">-</span>
+        <input class="score-input wide" id="aP" type="number" value="0" min="0" oninput="updateDiff()"/>
+      </div>
+    </div>
+    <div class="score-vs">VS</div>
+    <div class="score-team">
+      <div class="score-team-name"><input id="tnB" value="Team B" oninput="syncNames()"/></div>
+      <div class="score-display">
+        <input class="score-input" id="bG" type="number" value="0" min="0" oninput="updateDiff()"/>
+        <span class="score-sep">-</span>
+        <input class="score-input wide" id="bP" type="number" value="0" min="0" oninput="updateDiff()"/>
+      </div>
+    </div>
+    <div class="score-diff-badge">
+      <div class="diff-val" id="dv">0</div>
+      <div class="diff-lbl" id="dl">Level</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="meta-field"><label>Date</label><input type="date" id="mDate"/></div>
+    <div class="meta-field"><label>Match ID</label><input type="text" id="mId" placeholder="e.g. 2023_AIF"/></div>
+    <div class="count-badges">
+      <div class="count-badge"><div class="num" id="poC">0</div><div class="lbl">Puckouts</div></div>
+      <div class="count-badge"><div class="num fc" id="fpC">0</div><div class="lbl">Frees/65s</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="main-tabs">
+  <button class="main-tab ap" id="tabPO" onclick="switchTab('po')">⬆ Puckouts</button>
+  <button class="main-tab" id="tabFP" onclick="switchTab('fp')">◎ Frees &amp; 65s</button>
+</div>
+
+<main>
+<!-- PUCKOUT PANEL -->
+<div class="tagger-panel active" id="panPO">
+<div class="tagger">
+  <div>
+    <div class="st">Pucking Team &nbsp;<kbd>T</kbd> switch</div>
+    <div class="team-switcher">
+      <button class="team-btn aa" id="poBtnA" onclick="poSetTeam('A')">Team A</button>
+      <div class="sw-hint">← <kbd>T</kbd> →</div>
+      <button class="team-btn" id="poBtnB" onclick="poSetTeam('B')">Team B</button>
+    </div>
+  </div>
+  <div class="edit-banner" id="poEB">✎ EDITING PUCKOUT #<span id="poEN"></span> &nbsp;·&nbsp; <kbd>Esc</kbd> cancel</div>
+  <div>
+    <div class="st">Match State</div>
+    <div class="sr">
+      <div class="ig"><label>Minute</label><input type="number" id="poMin" placeholder="0" min="0" max="90"/></div>
+      <div class="ig"><label>Half</label><input type="number" id="poHalf" placeholder="1" min="1" max="2"/></div>
+    </div>
+  </div>
+  <div>
+    <div class="st">Puckout Type &nbsp;<span style="font-size:.48rem;color:var(--muted);text-transform:none;letter-spacing:0">auto-set from zone</span></div>
+    <div id="poTypeDisplay" style="background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted);text-align:center;">— select a zone —</div>
+  </div>
+  <div>
+    <div class="st">Delivery Code &nbsp;<kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd><kbd>F</kbd></div>
+    <div class="bg">
+      <button class="btn" data-g="pod" data-v="C" onclick="sb(this,'')" title="C — Clean: ball delivered to a player with space, caught cleanly, no opponent within contesting range at catch point">C — Clean</button>
+      <button class="btn" data-g="pod" data-v="P" onclick="sb(this,'orange')" title="P — Pressured: opponent arrives within contesting range at catch point but receiver still wins it">P — Pressured</button>
+      <button class="btn" data-g="pod" data-v="T" onclick="sb(this,'red')" title="T — Turnover delivery: ball intercepted or no teammate in position — possession lost directly at delivery point">T — Turnover</button>
+      <button class="btn" data-g="pod" data-v="B" onclick="sb(this,'orange')" title="B — Broken ball: no clean catch by either side — ball breaks loose into a 50/50 scramble">B — Broken</button>
+      <button class="btn" data-g="pod" data-v="X" onclick="sb(this,'red')" title="X — Failed delivery: ball goes out of play or lands with no realistic receiver">X — Failed</button>
+    </div>
+  </div>
+  <div>
+    <div class="st">Target Zone</div>
+    <div class="pitch" id="poPitch">
+      <div class="pr">
+        <button class="zb" data-z="AL" onclick="poSZ(this)">Attack<br>Left</button>
+        <button class="zb" data-z="AC" onclick="poSZ(this)">Attack<br>Centre</button>
+        <button class="zb" data-z="AR" onclick="poSZ(this)">Attack<br>Right</button>
+      </div>
+      <div class="pr">
+        <button class="zb" data-z="ML" onclick="poSZ(this)">Mid<br>Left</button>
+        <button class="zb" data-z="MC" onclick="poSZ(this)">Mid<br>Centre</button>
+        <button class="zb" data-z="MR" onclick="poSZ(this)">Mid<br>Right</button>
+      </div>
+      <div class="pr">
+        <button class="zb" data-z="DL" onclick="poSZ(this)">Def<br>Left</button>
+        <button class="zb" data-z="DC" onclick="poSZ(this)">Def<br>Centre</button>
+        <button class="zb" data-z="DR" onclick="poSZ(this)">Def<br>Right</button>
+      </div>
+    </div>
+    <div class="pl"><span>← Opp Goal</span><span>Own Goal →</span></div>
+  </div>
+  <div>
+    <div class="st">Retained? &nbsp;<kbd>Y</kbd> / <kbd>N</kbd></div>
+    <div class="rr">
+      <button class="rb yes" id="poRY" onclick="poSR(true)" title="The pucking team won possession of the ball after the puckout">✓ Yes</button>
+      <button class="rb no" id="poRN" onclick="poSR(false)" title="The opposition won possession — includes T and X deliveries and contested losses">✗ No</button>
+    </div>
+  </div>
+  <div>
+    <div class="st">Next Action &nbsp;<span style="font-size:.48rem;color:var(--muted);text-transform:none;letter-spacing:0">hover for definitions</span></div>
+    <div class="bg" style="flex-wrap:wrap;">
+      <button class="btn" data-g="poa" data-v="shot"     onclick="sb(this,'gold')"   title="Receiver or teammate attempts a score directly from this possession">Shot</button>
+      <button class="btn" data-g="poa" data-v="pass"     onclick="sb(this,'')"       title="Receiver moves the ball to a teammate — most common outcome">Pass</button>
+      <button class="btn" data-g="poa" data-v="launch"   onclick="sb(this,'blue')"   title="Ball played long downfield — use when a short puckout is immediately followed by a long kick">Launch</button>
+      <button class="btn" data-g="poa" data-v="carry"    onclick="sb(this,'')"       title="Player takes several steps and retains the ball themselves before releasing">Carry</button>
+      <button class="btn" data-g="poa" data-v="turnover" onclick="sb(this,'red')"    title="Pucking team loses possession cleanly after the ball was retained">Turnover</button>
+      <button class="btn" data-g="poa" data-v="foul-won" onclick="sb(this,'orange')" title="Ball lost in contest but the opposition immediately fouled the receiver — pucking team wins a free back">Foul Won</button>
+    </div>
+  </div>
+  <div><div class="st">Notes (optional)</div><textarea class="ni" id="poNotes" placeholder="e.g. Quaid to Hannon, opposition pressed..."></textarea></div>
+
+  <!-- POSSESSION CHAIN -->
+  <div class="chain-wrap">
+    <div class="chain-title">Possession Chain — next 3 touches</div>
+
+    <!-- Touch 1 -->
+    <div class="touch-row" id="t1row">
+      <div class="touch-label">Touch 1</div>
+      <div class="bg" style="gap:4px;">
+        <button class="btn" data-tc="t1team" data-v="A" id="t1tA" onclick="tcTeam(1,'A')" style="min-width:0;padding:5px 6px;font-size:.62rem;">A</button>
+        <button class="btn" data-tc="t1team" data-v="B" id="t1tB" onclick="tcTeam(1,'B')" style="min-width:0;padding:5px 6px;font-size:.62rem;">B</button>
+      </div>
+      <div class="bg" style="gap:3px;">
+        <button class="btn" data-tc="t1act" data-v="pass"     onclick="tcAct(1,this,'')"      title="Short hand-pass or short puck to teammate" style="min-width:0;padding:5px 4px;font-size:.58rem;">Pass</button>
+        <button class="btn" data-tc="t1act" data-v="launch"   onclick="tcAct(1,this,'blue')"  title="Long puck downfield — the key action for short-then-long patterns" style="min-width:0;padding:5px 4px;font-size:.58rem;">Launch</button>
+        <button class="btn" data-tc="t1act" data-v="carry"    onclick="tcAct(1,this,'')"      title="Player runs with the ball" style="min-width:0;padding:5px 4px;font-size:.58rem;">Carry</button>
+        <button class="btn" data-tc="t1act" data-v="shot"     onclick="tcAct(1,this,'gold')"  title="Attempt on goal or point — chain ends here, log shot outcome below" style="min-width:0;padding:5px 4px;font-size:.58rem;">Shot</button>
+        <button class="btn" data-tc="t1act" data-v="turnover" onclick="tcAct(1,this,'red')"   title="Team in possession lost the ball — record the team that LOST it, not the team that won it" style="min-width:0;padding:5px 4px;font-size:.58rem;">Turn</button>
+        <button class="btn" data-tc="t1act" data-v="foul-won" onclick="tcAct(1,this,'orange')" title="Free awarded to the team in possession" style="min-width:0;padding:5px 4px;font-size:.58rem;">Foul</button>
+      </div>
+    </div>
+
+    <!-- Touch 2 -->
+    <div class="touch-row dimmed" id="t2row">
+      <div class="touch-label">Touch 2</div>
+      <div class="bg" style="gap:4px;">
+        <button class="btn" data-tc="t2team" data-v="A" id="t2tA" onclick="tcTeam(2,'A')" style="min-width:0;padding:5px 6px;font-size:.62rem;">A</button>
+        <button class="btn" data-tc="t2team" data-v="B" id="t2tB" onclick="tcTeam(2,'B')" style="min-width:0;padding:5px 6px;font-size:.62rem;">B</button>
+      </div>
+      <div class="bg" style="gap:3px;">
+        <button class="btn" data-tc="t2act" data-v="pass"     onclick="tcAct(2,this,'')"      style="min-width:0;padding:5px 4px;font-size:.58rem;">Pass</button>
+        <button class="btn" data-tc="t2act" data-v="launch"   onclick="tcAct(2,this,'blue')"  style="min-width:0;padding:5px 4px;font-size:.58rem;">Launch</button>
+        <button class="btn" data-tc="t2act" data-v="carry"    onclick="tcAct(2,this,'')"      style="min-width:0;padding:5px 4px;font-size:.58rem;">Carry</button>
+        <button class="btn" data-tc="t2act" data-v="shot"     onclick="tcAct(2,this,'gold')"  style="min-width:0;padding:5px 4px;font-size:.58rem;">Shot</button>
+        <button class="btn" data-tc="t2act" data-v="turnover" onclick="tcAct(2,this,'red')"   title="Record the team that LOST possession, not the team that won it" style="min-width:0;padding:5px 4px;font-size:.58rem;">Turn</button>
+        <button class="btn" data-tc="t2act" data-v="foul-won" onclick="tcAct(2,this,'orange')" style="min-width:0;padding:5px 4px;font-size:.58rem;">Foul</button>
+      </div>
+    </div>
+
+    <!-- Touch 3 -->
+    <div class="touch-row dimmed" id="t3row">
+      <div class="touch-label">Touch 3</div>
+      <div class="bg" style="gap:4px;">
+        <button class="btn" data-tc="t3team" data-v="A" id="t3tA" onclick="tcTeam(3,'A')" style="min-width:0;padding:5px 6px;font-size:.62rem;">A</button>
+        <button class="btn" data-tc="t3team" data-v="B" id="t3tB" onclick="tcTeam(3,'B')" style="min-width:0;padding:5px 6px;font-size:.62rem;">B</button>
+      </div>
+      <div class="bg" style="gap:3px;">
+        <button class="btn" data-tc="t3act" data-v="pass"     onclick="tcAct(3,this,'')"      style="min-width:0;padding:5px 4px;font-size:.58rem;">Pass</button>
+        <button class="btn" data-tc="t3act" data-v="launch"   onclick="tcAct(3,this,'blue')"  style="min-width:0;padding:5px 4px;font-size:.58rem;">Launch</button>
+        <button class="btn" data-tc="t3act" data-v="carry"    onclick="tcAct(3,this,'')"      style="min-width:0;padding:5px 4px;font-size:.58rem;">Carry</button>
+        <button class="btn" data-tc="t3act" data-v="shot"     onclick="tcAct(3,this,'gold')"  style="min-width:0;padding:5px 4px;font-size:.58rem;">Shot</button>
+        <button class="btn" data-tc="t3act" data-v="turnover" onclick="tcAct(3,this,'red')"   title="Record the team that LOST possession, not the team that won it" style="min-width:0;padding:5px 4px;font-size:.58rem;">Turn</button>
+        <button class="btn" data-tc="t3act" data-v="foul-won" onclick="tcAct(3,this,'orange')" style="min-width:0;padding:5px 4px;font-size:.58rem;">Foul</button>
+      </div>
+    </div>
+
+    <!-- Shot outcome -->
+    <div class="shot-row dimmed" id="shotRow">
+      <div class="touch-label" style="color:var(--gold);">Shot<br>outcome</div>
+      <div class="bg" style="gap:4px;flex-wrap:wrap;">
+        <button class="sob" data-v="point"   onclick="tcShot(this,'')"      title="Over the bar — 1 point">✓ Point</button>
+        <button class="sob" data-v="goal"    onclick="tcShot(this,'gold')"  title="Into the net — 3 points">⚡ Goal</button>
+        <button class="sob" data-v="wide"    onclick="tcShot(this,'red')"   title="Outside the posts">Wide</button>
+        <button class="sob" data-v="short"   onclick="tcShot(this,'red')"   title="Drops short of the posts">Short</button>
+        <button class="sob" data-v="saved"   onclick="tcShot(this,'orange')" title="Stopped by the goalkeeper">Saved</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POSSESSION OUTCOME (second pass) -->
+  <div style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.2);border-radius:8px;padding:10px 12px;">
+    <div class="st" style="color:var(--gold);">Possession Outcome &nbsp;<span style="font-size:.48rem;color:var(--muted);text-transform:none;letter-spacing:0">did this possession lead to a score within ~60 seconds?</span></div>
+    <div class="bg" style="gap:5px;">
+      <button class="btn" data-g="poo" data-v="point"     onclick="sb(this,'')"      title="Pucking team scored a point within ~60 seconds of this puckout">✓ Point</button>
+      <button class="btn" data-g="poo" data-v="goal"      onclick="sb(this,'gold')"  title="Pucking team scored a goal within ~60 seconds of this puckout">⚡ Goal</button>
+      <button class="btn" data-g="poo" data-v="no-score"  onclick="sb(this,'')"      title="No score for either team within ~60 seconds — possession moved on without a score">No Score</button>
+      <button class="btn" data-g="poo" data-v="opp-point" onclick="sb(this,'red')"   title="Opposition scored a point within ~60 seconds of winning this puckout — negative value">✗ Opp Pt</button>
+      <button class="btn" data-g="poo" data-v="opp-goal"  onclick="sb(this,'red')"   title="Opposition scored a goal within ~60 seconds of winning this puckout — high negative value">✗ Opp Goal</button>
+    </div>
+  </div>
+
+  <button class="lb pl-btn" id="poLB" onclick="poHL()">LOG PUCKOUT</button>
+  <button class="cb" id="poCB" onclick="poCancel()">✕ Cancel Edit</button>
+  <div class="kh"><kbd>Space</kbd>/<kbd>Enter</kbd> log &nbsp;·&nbsp; <kbd>T</kbd> switch team (full reset) &nbsp;·&nbsp; <kbd>Esc</kbd> cancel<br>Next action: hover buttons for definitions &nbsp;·&nbsp; Click any entry to edit</div>
+</div>
+</div>
+
+<!-- FREES PANEL -->
+<div class="tagger-panel" id="panFP">
+<div class="tagger">
+  <div>
+    <div class="st">Shooting Team &nbsp;<kbd>T</kbd> switch</div>
+    <div class="team-switcher">
+      <button class="team-btn aa" id="fpBtnA" onclick="fpSetTeam('A')">Team A</button>
+      <div class="sw-hint">← <kbd>T</kbd> →</div>
+      <button class="team-btn" id="fpBtnB" onclick="fpSetTeam('B')">Team B</button>
+    </div>
+  </div>
+  <div class="edit-banner" id="fpEB">✎ EDITING #<span id="fpEN"></span> &nbsp;·&nbsp; <kbd>Esc</kbd> cancel</div>
+  <div>
+    <div class="st">Match State</div>
+    <div class="sr">
+      <div class="ig"><label>Minute</label><input type="number" id="fpMin" placeholder="0" min="0" max="90"/></div>
+      <div class="ig"><label>Half</label><input type="number" id="fpHalf" placeholder="1" min="1" max="2"/></div>
+    </div>
+  </div>
+  <div>
+    <div class="st">Set Piece Type &nbsp;<kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></div>
+    <div class="bg">
+      <button class="btn" data-g="fpt" data-v="free" onclick="sb(this,'purple')" title="A free awarded for a foul anywhere on the pitch — location varies">Free</button>
+      <button class="btn" data-g="fpt" data-v="65" onclick="sb(this,'blue')" title="Awarded when a defender puts the ball over their own endline — always taken from the 65m line">65</button>
+      <button class="btn" data-g="fpt" data-v="sideline" onclick="sb(this,'orange')" title="Awarded when the ball goes out over the sideline — taken from where it crossed the line">Sideline</button>
+    </div>
+  </div>
+  <div>
+    <div class="st">Shooter</div>
+    <div class="ig"><input type="text" id="fpShooter" class="left" placeholder="Player name or number"/></div>
+  </div>
+  <div>
+    <div class="st">Position on Pitch — click to place</div>
+    <div class="fp" id="fpPitch">
+      <div class="fpr">
+        <button class="fzb" data-z="F1L" onclick="fpSZ(this)">L &lt;13m</button>
+        <button class="fzb" data-z="F1CL" onclick="fpSZ(this)">CL &lt;13m</button>
+        <button class="fzb" data-z="F1CR" onclick="fpSZ(this)">CR &lt;13m</button>
+        <button class="fzb" data-z="F1R" onclick="fpSZ(this)">R &lt;13m</button>
+      </div>
+      <div class="fpr">
+        <button class="fzb" data-z="F2L" onclick="fpSZ(this)">L 13–21m</button>
+        <button class="fzb" data-z="F2CL" onclick="fpSZ(this)">CL 13–21m</button>
+        <button class="fzb" data-z="F2CR" onclick="fpSZ(this)">CR 13–21m</button>
+        <button class="fzb" data-z="F2R" onclick="fpSZ(this)">R 13–21m</button>
+      </div>
+      <div class="fpr">
+        <button class="fzb" data-z="F3L" onclick="fpSZ(this)">L 21–45m</button>
+        <button class="fzb" data-z="F3CL" onclick="fpSZ(this)">CL 21–45m</button>
+        <button class="fzb" data-z="F3CR" onclick="fpSZ(this)">CR 21–45m</button>
+        <button class="fzb" data-z="F3R" onclick="fpSZ(this)">R 21–45m</button>
+      </div>
+      <div class="fpr">
+        <button class="fzb" data-z="F4L" onclick="fpSZ(this)">L 45–65m</button>
+        <button class="fzb" data-z="F4CL" onclick="fpSZ(this)">CL 45–65m</button>
+        <button class="fzb" data-z="F4CR" onclick="fpSZ(this)">CR 45–65m</button>
+        <button class="fzb" data-z="F4R" onclick="fpSZ(this)">R 45–65m</button>
+      </div>
+      <div class="fpr">
+        <button class="fzb" data-z="F5L" onclick="fpSZ(this)">L &gt;65m</button>
+        <button class="fzb" data-z="F5CL" onclick="fpSZ(this)">CL &gt;65m</button>
+        <button class="fzb" data-z="F5CR" onclick="fpSZ(this)">CR &gt;65m</button>
+        <button class="fzb" data-z="F5R" onclick="fpSZ(this)">R &gt;65m</button>
+      </div>
+    </div>
+    <div class="pl"><span>← Left Wing</span><span>Right Wing →</span></div>
+  </div>
+  <div>
+    <div class="st">Attempt Type &nbsp;<kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd></div>
+    <div class="bg">
+      <button class="btn" data-g="fpa" data-v="direct" onclick="sb(this,'purple')" title="Strike at the posts — point or goal attempt">Direct — score attempt</button>
+      <button class="btn" data-g="fpa" data-v="goal" onclick="sb(this,'gold')" title="Deliberate attempt to score a goal rather than a point">Goal attempt</button>
+      <button class="btn" data-g="fpa" data-v="short" onclick="sb(this,'orange')" title="Ball played to a nearby teammate rather than struck at the posts — retention is the outcome to log">Played short</button>
+      <button class="btn" data-g="fpa" data-v="long" onclick="sb(this,'blue')" title="Ball played long for field position — e.g. a deep free taken like a puckout. Log retention as the outcome">Played long</button>
+    </div>
+  </div>
+  <div>
+    <div class="st">Striking Side &nbsp;<kbd>A</kbd><kbd>S</kbd></div>
+    <div class="bg">
+      <button class="btn" data-g="fps" data-v="dominant" onclick="sb(this,'')" title="Player strikes from their stronger/preferred side">Dominant hand</button>
+      <button class="btn" data-g="fps" data-v="non-dominant" onclick="sb(this,'orange')" title="Player forced to strike from their weaker side — typically harder and less accurate">Non-dominant</button>
+    </div>
+  </div>
+  <div>
+    <div class="st">Pressure / Wall &nbsp;<kbd>P</kbd></div>
+    <div class="bg">
+      <button class="btn" data-g="fpp" data-v="none" onclick="sb(this,'')" title="Taker has a clear run-up with no defenders rushing or forming a wall">No pressure</button>
+      <button class="btn" data-g="fpp" data-v="rush" onclick="sb(this,'orange')" title="One or more defenders charge the taker to block or distract the strike">Rush / charge</button>
+      <button class="btn" data-g="fpp" data-v="wall" onclick="sb(this,'red')" title="Defenders form a stationary wall to block the direct route to goal">Wall</button>
+    </div>
+  </div>
+  <div>
+    <div class="st">Outcome &nbsp;<kbd>Z</kbd><kbd>X</kbd><kbd>C</kbd><kbd>V</kbd><kbd>B</kbd><kbd>M</kbd><kbd>N</kbd><kbd>,</kbd></div>
+    <div class="og">
+      <button class="btn" data-g="fpo" data-v="point" onclick="sb(this,'')" title="Ball goes over the bar and between the posts — scores 1 point">✓ Point</button>
+      <button class="btn" data-g="fpo" data-v="goal" onclick="sb(this,'gold')" title="Ball goes into the net — scores 3 points">⚽ Goal</button>
+      <button class="btn" data-g="fpo" data-v="wide" onclick="sb(this,'red')" title="Ball goes over the endline but outside the posts — no score">Wide</button>
+      <button class="btn" data-g="fpo" data-v="short" onclick="sb(this,'red')" title="Ball fails to reach the endline — drops short of the posts">Short</button>
+      <button class="btn" data-g="fpo" data-v="saved" onclick="sb(this,'orange')" title="Goalkeeper stops the shot — typically from a direct goal attempt">Saved</button>
+      <button class="btn" data-g="fpo" data-v="cleared" onclick="sb(this,'orange')" title="A defender blocks or clears the ball before it reaches goal">Cleared</button>
+      <button class="btn" data-g="fpo" data-v="retained" onclick="sb(this,'')" title="Use for Played short or Played long — the taking team won possession after the set piece">✓ Retained</button>
+      <button class="btn" data-g="fpo" data-v="lost" onclick="sb(this,'red')" title="Use for Played short or Played long — the taking team lost possession after the set piece">✗ Lost</button>
+    </div>
+  </div>
+  <div><div class="st">Notes (optional)</div><textarea class="ni" id="fpNotes" placeholder="e.g. TJ Reid, 55m right wing, wind against..."></textarea></div>
+  <button class="lb fr-btn" id="fpLB" onclick="fpHL()">LOG FREE / 65</button>
+  <button class="cb" id="fpCB" onclick="fpCancel()">✕ Cancel Edit</button>
+  <div class="kh"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> type &nbsp;·&nbsp; <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> attempt &nbsp;·&nbsp; <kbd>A</kbd><kbd>S</kbd> side &nbsp;·&nbsp; <kbd>P</kbd> pressure<br>Outcome: <kbd>Z</kbd> point &nbsp;<kbd>X</kbd> goal &nbsp;<kbd>C</kbd> wide &nbsp;<kbd>V</kbd> short &nbsp;<kbd>B</kbd> saved &nbsp;<kbd>M</kbd> cleared &nbsp;<kbd>N</kbd> retained &nbsp;<kbd>,</kbd> lost<br><kbd>T</kbd> switch team &nbsp;·&nbsp; <kbd>Space</kbd>/<kbd>Enter</kbd> log &nbsp;·&nbsp; <kbd>Esc</kbd> cancel &nbsp;·&nbsp; hover buttons for definitions</div>
+</div>
+</div>
+
+<!-- LOG PANEL -->
+<div class="log-panel">
+  <div class="lh">
+    <h2 id="logTitle">Match Log</h2>
+    <div class="lh-btns">
+      <button class="eb" onclick="doExport('po')">Export Puckouts</button>
+      <button class="eb fe" onclick="doExport('fp')">Export Frees</button>
+    </div>
+  </div>
+  <div class="lf">
+    <button class="ft active" onclick="setF('all',this)">All</button>
+    <button class="ft ta" id="ftA" onclick="setF('A',this)">Team A</button>
+    <button class="ft tb" id="ftB" onclick="setF('B',this)">Team B</button>
+    <button class="ft tf" onclick="setF('fp',this)">Frees/65s</button>
+  </div>
+  <div class="ll" id="logList">
+    <div class="el">Nothing logged yet.<br>Use the tabs above to switch<br>between Puckouts and Frees/65s.</div>
+  </div>
+  <div class="sb">
+    <div class="sv"><div class="v" id="sAll">—</div><div class="l">PO Ret%</div></div>
+    <div class="sv"><div class="v a" id="sA">—</div><div class="l" id="lA">A Ret%</div></div>
+    <div class="sv"><div class="v b" id="sB">—</div><div class="l" id="lB">B Ret%</div></div>
+    <div class="sv"><div class="v p" id="sFP">—</div><div class="l">Free Conv%</div></div>
+  </div>
+</div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var puckouts=[],frees=[],nPO=1,nFP=1,tab='po',filt='all';
+var poTeam='A',poType=null,poDel=null,poZone=null,poRet=null,poAct=null,poOut=null,poEid=null;
+var fpTeam='A',fpType=null,fpZone=null,fpAtt=null,fpSide=null,fpPres=null,fpOut=null,fpEid=null;
+// Touch chain state
+var tcState={t1team:null,t1act:null,t2team:null,t2act:null,t3team:null,t3act:null,shotOut:null};
+
+document.getElementById('mDate').valueAsDate=new Date();
+syncNames();
+
+function tn(t){return document.getElementById('tn'+t).value.trim()||'Team '+t}
+function gs(t){var g=parseInt(document.getElementById((t=='A'?'a':'b')+'G').value)||0,p=parseInt(document.getElementById((t=='A'?'a':'b')+'P').value)||0;return{g:g,p:p,tot:g*3+p}}
+function updateDiff(){var a=gs('A'),b=gs('B'),d=a.tot-b.tot;var el=document.getElementById('dv'),ll=document.getElementById('dl');el.textContent=d==0?'0':(d>0?'+':'')+d;el.style.color=d==0?'var(--muted)':d>0?'var(--team-a)':'var(--team-b)';ll.textContent=d==0?'Level':(d>0?tn('A'):tn('B'))+' ahead'}
+function syncNames(){['A','B'].forEach(function(t){document.getElementById('poBtnA').textContent=tn('A');document.getElementById('poBtnB').textContent=tn('B');document.getElementById('fpBtnA').textContent=tn('A');document.getElementById('fpBtnB').textContent=tn('B');document.getElementById('ftA').textContent=tn('A');document.getElementById('ftB').textContent=tn('B');document.getElementById('lA').textContent=tn('A').substring(0,6)+'%';document.getElementById('lB').textContent=tn('B').substring(0,6)+'%'});
+  // update touch chain team buttons
+  [1,2,3].forEach(function(n){
+    var aBtn=document.getElementById('t'+n+'tA');
+    var bBtn=document.getElementById('t'+n+'tB');
+    if(aBtn) aBtn.textContent=tn('A');
+    if(bBtn) bBtn.textContent=tn('B');
+  });
+  updateDiff();renderLog()}
+
+function switchTab(t){tab=t;document.getElementById('panPO').classList.toggle('active',t=='po');document.getElementById('panFP').classList.toggle('active',t=='fp');document.getElementById('tabPO').className='main-tab'+(t=='po'?' ap':'');document.getElementById('tabFP').className='main-tab'+(t=='fp'?' af':'')}
+
+function sb(btn,cls){var g=btn.dataset.g;document.querySelectorAll('[data-g="'+g+'"]').forEach(function(b){b.classList.remove('active','red','blue','orange','gold','purple')});btn.classList.add('active');if(cls)btn.classList.add(cls);
+if(g=='pot')poType=btn.dataset.v;if(g=='pod')poDel=btn.dataset.v;if(g=='poa')poAct=btn.dataset.v;if(g=='poo')poOut=btn.dataset.v;
+if(g=='fpt')fpType=btn.dataset.v;if(g=='fpa')fpAtt=btn.dataset.v;if(g=='fps')fpSide=btn.dataset.v;if(g=='fpp')fpPres=btn.dataset.v;if(g=='fpo')fpOut=btn.dataset.v}
+
+// TOUCH CHAIN
+function tcTeam(n,t){
+  tcState['t'+n+'team']=t;
+  var aBtn=document.getElementById('t'+n+'tA'),bBtn=document.getElementById('t'+n+'tB');
+  aBtn.classList.toggle('active',t==='A'); aBtn.classList.toggle('blue',t==='A');
+  bBtn.classList.toggle('active',t==='B'); bBtn.classList.toggle('orange',t==='B');
+  // auto-set next touch team if it hasn't been set yet
+  var next=n+1;
+  if(next<=3 && tcState['t'+next+'team']===null) tcTeam(next,t);
+}
+
+function tcAct(n,btn,cls){
+  // clear buttons for this touch
+  document.querySelectorAll('[data-tc="t'+n+'act"]').forEach(function(b){b.classList.remove('active','red','blue','orange','gold')});
+  btn.classList.add('active'); if(cls) btn.classList.add(cls);
+  tcState['t'+n+'act']=btn.dataset.v;
+  // if shot — dim subsequent touch rows, activate shot outcome row
+  var isShot=btn.dataset.v==='shot';
+  if(n<=2){
+    var nextRow=document.getElementById('t'+(n+1)+'row');
+    if(isShot){nextRow.classList.add('dimmed')} else {nextRow.classList.remove('dimmed')}
+  }
+  if(n<=3){
+    var sr=document.getElementById('shotRow');
+    // activate shot outcome if any touch is a shot
+    var anyShot=tcState.t1act==='shot'||tcState.t2act==='shot'||tcState.t3act==='shot'||btn.dataset.v==='shot';
+    sr.classList.toggle('dimmed',!anyShot);
+  }
+  if(n<3 && !isShot){document.getElementById('t'+(n+1)+'row').classList.remove('dimmed')}
+  // dim t3 if t2 is shot
+  if(n===2 && isShot) document.getElementById('t3row').classList.add('dimmed');
+}
+
+function tcShot(btn,cls){
+  document.querySelectorAll('.sob').forEach(function(b){b.classList.remove('active','red','gold','orange')});
+  btn.classList.add('active'); if(cls) btn.classList.add(cls);
+  tcState.shotOut=btn.dataset.v;
+}
+
+function tcResetForm(){
+  // reset all touch chain buttons and state
+  [1,2,3].forEach(function(n){
+    document.querySelectorAll('[data-tc="t'+n+'act"]').forEach(function(b){b.classList.remove('active','red','blue','orange','gold')});
+    var aBtn=document.getElementById('t'+n+'tA'),bBtn=document.getElementById('t'+n+'tB');
+    if(aBtn){aBtn.classList.remove('active','blue')} if(bBtn){bBtn.classList.remove('active','orange')}
+    if(n>1) document.getElementById('t'+n+'row').classList.add('dimmed');
+  });
+  document.querySelectorAll('.sob').forEach(function(b){b.classList.remove('active','red','gold','orange')});
+  document.getElementById('shotRow').classList.add('dimmed');
+  document.getElementById('t1row').classList.remove('dimmed');
+  tcState={t1team:null,t1act:null,t2team:null,t2act:null,t3team:null,t3act:null,shotOut:null};
+}
+
+function tcRestore(p){
+  tcResetForm();
+  if(p.t1team) tcTeam(1,p.t1team);
+  if(p.t1act){var b=document.querySelector('[data-tc="t1act"][data-v="'+p.t1act+'"]');if(b) tcAct(1,b,{launch:'blue',shot:'gold',turnover:'red','foul-won':'orange'}[p.t1act]||'')}
+  if(p.t2team) tcTeam(2,p.t2team);
+  if(p.t2act){var b=document.querySelector('[data-tc="t2act"][data-v="'+p.t2act+'"]');if(b) tcAct(2,b,{launch:'blue',shot:'gold',turnover:'red','foul-won':'orange'}[p.t2act]||'')}
+  if(p.t3team) tcTeam(3,p.t3team);
+  if(p.t3act){var b=document.querySelector('[data-tc="t3act"][data-v="'+p.t3act+'"]');if(b) tcAct(3,b,{launch:'blue',shot:'gold',turnover:'red','foul-won':'orange'}[p.t3act]||'')}
+  if(p.shot_out||p.shotOut){
+    var sv=p.shot_out||p.shotOut;
+    document.getElementById('shotRow').classList.remove('dimmed');
+    var b=document.querySelector('.sob[data-v="'+sv+'"]');
+    if(b) tcShot(b,{goal:'gold',wide:'red',short:'red',saved:'orange'}[sv]||'');
+  }
+}
+
+// PUCKOUT FORM
+function poSetTeam(t){if(poEid!==null)poCancel();poTeam=t;document.getElementById('poBtnA').className='team-btn'+(t=='A'?' aa':'');document.getElementById('poBtnB').className='team-btn'+(t=='B'?' ab':'');poReset()}
+function poSZ(btn){
+  document.querySelectorAll('#poPitch .zb').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  poZone=btn.dataset.z;
+  // auto-derive type from zone
+  var zmap={'DL':'short','DC':'short','DR':'short','ML':'medium','MC':'medium','MR':'medium','AL':'long','AC':'long','AR':'long'};
+  poType=zmap[poZone]||'unknown';
+  var colours={'short':'var(--blue)','medium':'var(--orange)','long':'var(--red)'};
+  var disp=document.getElementById('poTypeDisplay');
+  disp.textContent=poType.toUpperCase();
+  disp.style.color=colours[poType]||'var(--muted)';
+  disp.style.borderColor=colours[poType]||'var(--border)';
+}
+function poSR(v){poRet=v;document.querySelectorAll('.rb').forEach(function(b){b.classList.remove('active')});document.getElementById(v?'poRY':'poRN').classList.add('active')}
+function poBuild(id){var ps=gs(poTeam),os=gs(poTeam=='A'?'B':'A');return{kind:'po',id:id,match:document.getElementById('mId').value.trim()||'Unknown',date:document.getElementById('mDate').value||'',team_a:tn('A'),team_b:tn('B'),pucking_team:tn(poTeam),ptk:poTeam,half:parseInt(document.getElementById('poHalf').value)||1,minute:document.getElementById('poMin').value||'?',spg:ps.g,spp:ps.p,sog:os.g,sop:os.p,diff:ps.tot-os.tot,type:poType||'unknown',delivery:poDel||'unknown',zone:poZone||'unknown',retained:poRet===null?'unknown':(poRet?'yes':'no'),action:poAct||'unknown',poss_outcome:poOut||'',notes:document.getElementById('poNotes').value.trim(),t1team:tcState.t1team||'',t1act:tcState.t1act||'',t2team:tcState.t2team||'',t2act:tcState.t2act||'',t3team:tcState.t3team||'',t3act:tcState.t3act||'',shot_out:tcState.shotOut||''}}
+function poHL(){poEid!==null?poSave():poLog()}
+function poLog(){puckouts.unshift(poBuild(nPO++));renderLog();updateStats();poReset();toast('PUCKOUT LOGGED','lime');pulse('poLB')}
+function poStartEdit(id){var p=puckouts.find(function(x){return x.id==id});if(!p)return;poEid=id;poTeam=p.ptk;document.getElementById('poBtnA').className='team-btn'+(poTeam=='A'?' aa':'');document.getElementById('poBtnB').className='team-btn'+(poTeam=='B'?' ab':'');var aG=poTeam=='A'?p.spg:p.sog,aP=poTeam=='A'?p.spp:p.sop,bG=poTeam=='B'?p.spg:p.sog,bP=poTeam=='B'?p.spp:p.sop;document.getElementById('aG').value=aG;document.getElementById('aP').value=aP;document.getElementById('bG').value=bG;document.getElementById('bP').value=bP;updateDiff();document.getElementById('poMin').value=p.minute=='?'?'':p.minute;document.getElementById('poHalf').value=p.half;document.getElementById('poNotes').value=p.notes;restoreBtn('pot',p.type,{short:'blue',medium:'orange',long:'red'});poType=p.type;restoreBtn('pod',p.delivery,{C:'',P:'orange',T:'red',B:'orange',X:'red'});poDel=p.delivery;restoreBtn('poa',p.action,{shot:'gold',pass:'',launch:'blue',carry:'',turnover:'red','foul-won':'orange'});poAct=p.action;restoreBtn('poo',p.poss_outcome,{point:'',goal:'gold','no-score':'','opp-point':'red','opp-goal':'red'});poOut=p.poss_outcome||null;document.querySelectorAll('#poPitch .zb').forEach(function(b){b.classList.remove('active')});var zb=document.querySelector('#poPitch [data-z="'+p.zone+'"]');if(zb){zb.classList.add('active');poZone=p.zone;var zmap={'DL':'short','DC':'short','DR':'short','ML':'medium','MC':'medium','MR':'medium','AL':'long','AC':'long','AR':'long'};poType=zmap[p.zone]||p.type||'unknown';var colours={'short':'var(--blue)','medium':'var(--orange)','long':'var(--red)'};var disp=document.getElementById('poTypeDisplay');disp.textContent=poType.toUpperCase();disp.style.color=colours[poType]||'var(--muted)';disp.style.borderColor=colours[poType]||'var(--border)'}if(p.retained=='yes')poSR(true);else if(p.retained=='no')poSR(false);else{document.querySelectorAll('.rb').forEach(function(b){b.classList.remove('active')});poRet=null}document.getElementById('poLB').textContent='UPDATE PUCKOUT';document.getElementById('poLB').classList.add('editing');document.getElementById('poCB').classList.add('show');document.getElementById('poEB').classList.add('show');document.getElementById('poEN').textContent=id;hilite('po-'+id);switchTab('po');tcRestore(p);document.getElementById('poMin').focus()}
+function poSave(){var idx=puckouts.findIndex(function(x){return x.id==poEid});if(idx!==-1)puckouts[idx]=poBuild(poEid);renderLog();updateStats();poCancel();toast('UPDATED','gold')}
+function poCancel(){poEid=null;document.getElementById('poLB').textContent='LOG PUCKOUT';document.getElementById('poLB').classList.remove('editing');document.getElementById('poCB').classList.remove('show');document.getElementById('poEB').classList.remove('show');clearHilite();poReset()}
+function poReset(){document.getElementById('poMin').value='';document.getElementById('poHalf').value='';document.getElementById('poNotes').value='';['pod','poa','poo'].forEach(function(g){document.querySelectorAll('[data-g="'+g+'"]').forEach(function(b){b.classList.remove('active','red','blue','orange','gold','purple')})});document.querySelectorAll('#poPitch .zb').forEach(function(b){b.classList.remove('active')});document.querySelectorAll('.rb').forEach(function(b){b.classList.remove('active')});var disp=document.getElementById('poTypeDisplay');disp.textContent='— select a zone —';disp.style.color='var(--muted)';disp.style.borderColor='var(--border)';poType=null;poDel=null;poZone=null;poRet=null;poAct=null;poOut=null;tcResetForm();document.getElementById('poMin').focus()}
+
+// FREES FORM
+function fpSetTeam(t){if(fpEid!==null)fpCancel();fpTeam=t;document.getElementById('fpBtnA').className='team-btn'+(t=='A'?' aa':'');document.getElementById('fpBtnB').className='team-btn'+(t=='B'?' ab':'');fpReset()}
+function fpSZ(btn){document.querySelectorAll('#fpPitch .fzb').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');fpZone=btn.dataset.z}
+function fpBuild(id){var ps=gs(fpTeam),os=gs(fpTeam=='A'?'B':'A');return{kind:'fp',id:id,match:document.getElementById('mId').value.trim()||'Unknown',date:document.getElementById('mDate').value||'',team_a:tn('A'),team_b:tn('B'),shooting_team:tn(fpTeam),stk:fpTeam,half:parseInt(document.getElementById('fpHalf').value)||1,minute:document.getElementById('fpMin').value||'?',ssg:ps.g,ssp:ps.p,sog:os.g,sop:os.p,diff:ps.tot-os.tot,spt:fpType||'unknown',shooter:document.getElementById('fpShooter').value.trim()||'',zone:fpZone||'unknown',attempt:fpAtt||'unknown',side:fpSide||'unknown',pressure:fpPres||'unknown',outcome:fpOut||'unknown',notes:document.getElementById('fpNotes').value.trim()}}
+function fpHL(){fpEid!==null?fpSave():fpLog()}
+function fpLog(){frees.unshift(fpBuild(nFP++));renderLog();updateStats();fpReset();toast('FREE LOGGED','purple');pulse('fpLB')}
+function fpStartEdit(id){var p=frees.find(function(x){return x.id==id});if(!p)return;fpEid=id;fpTeam=p.stk;document.getElementById('fpBtnA').className='team-btn'+(fpTeam=='A'?' aa':'');document.getElementById('fpBtnB').className='team-btn'+(fpTeam=='B'?' ab':'');var aG=fpTeam=='A'?p.ssg:p.sog,aP=fpTeam=='A'?p.ssp:p.sop,bG=fpTeam=='B'?p.ssg:p.sog,bP=fpTeam=='B'?p.ssp:p.sop;document.getElementById('aG').value=aG;document.getElementById('aP').value=aP;document.getElementById('bG').value=bG;document.getElementById('bP').value=bP;updateDiff();document.getElementById('fpMin').value=p.minute=='?'?'':p.minute;document.getElementById('fpHalf').value=p.half;document.getElementById('fpShooter').value=p.shooter;document.getElementById('fpNotes').value=p.notes;restoreBtn('fpt',p.spt,{free:'purple','65':'blue',sideline:'orange'});fpType=p.spt;restoreBtn('fpa',p.attempt,{direct:'purple',goal:'gold',short:'orange',long:'blue'});fpAtt=p.attempt;restoreBtn('fps',p.side,{dominant:'','non-dominant':'orange'});fpSide=p.side;restoreBtn('fpp',p.pressure,{none:'',rush:'orange',wall:'red'});fpPres=p.pressure;restoreBtn('fpo',p.outcome,{point:'',goal:'gold',wide:'red',short:'red',saved:'orange',cleared:'orange',retained:'',lost:'red'});fpOut=p.outcome;document.querySelectorAll('#fpPitch .fzb').forEach(function(b){b.classList.remove('active')});var zb=document.querySelector('#fpPitch [data-z="'+p.zone+'"]');if(zb){zb.classList.add('active');fpZone=p.zone}document.getElementById('fpLB').textContent='UPDATE FREE / 65';document.getElementById('fpLB').classList.add('editing');document.getElementById('fpCB').classList.add('show');document.getElementById('fpEB').classList.add('show');document.getElementById('fpEN').textContent=id;hilite('fp-'+id);switchTab('fp');document.getElementById('fpMin').focus()}
+function fpSave(){var idx=frees.findIndex(function(x){return x.id==fpEid});if(idx!==-1)frees[idx]=fpBuild(fpEid);renderLog();updateStats();fpCancel();toast('UPDATED','gold')}
+function fpCancel(){fpEid=null;document.getElementById('fpLB').textContent='LOG FREE / 65';document.getElementById('fpLB').classList.remove('editing');document.getElementById('fpCB').classList.remove('show');document.getElementById('fpEB').classList.remove('show');clearHilite();fpReset()}
+function fpReset(){document.getElementById('fpMin').value='';document.getElementById('fpHalf').value='';document.getElementById('fpShooter').value='';document.getElementById('fpNotes').value='';['fpt','fpa','fps','fpp','fpo'].forEach(function(g){document.querySelectorAll('[data-g="'+g+'"]').forEach(function(b){b.classList.remove('active','red','blue','orange','gold','purple')})});document.querySelectorAll('#fpPitch .fzb').forEach(function(b){b.classList.remove('active')});fpType=null;fpZone=null;fpAtt=null;fpSide=null;fpPres=null;fpOut=null;document.getElementById('fpMin').focus()}
+
+function restoreBtn(grp,val,cmap){document.querySelectorAll('[data-g="'+grp+'"]').forEach(function(b){b.classList.remove('active','red','blue','orange','gold','purple');if(b.dataset.v==val){b.classList.add('active');var c=cmap[val];if(c)b.classList.add(c)}})}
+function hilite(eid){clearHilite();var el=document.getElementById('le-'+eid);if(el){el.classList.add('en');el.scrollIntoView({behavior:'smooth',block:'nearest'})}}
+function clearHilite(){document.querySelectorAll('.le').forEach(function(el){el.classList.remove('en')})}
+
+function setF(f,tab){filt=f;document.querySelectorAll('.ft').forEach(function(t){t.classList.remove('active')});tab.classList.add('active');renderLog()}
+
+function renderLog(){
+  var list=document.getElementById('logList');
+  document.getElementById('poC').textContent=puckouts.length;
+  document.getElementById('fpC').textContent=frees.length;
+  var all=[].concat(puckouts.map(function(p){return Object.assign({},p,{_tk:p.ptk})}),frees.map(function(f){return Object.assign({},f,{_tk:f.stk})}));
+  var shown=all;
+  if(filt=='A')shown=all.filter(function(x){return x._tk=='A'});
+  if(filt=='B')shown=all.filter(function(x){return x._tk=='B'});
+  if(filt=='fp')shown=all.filter(function(x){return x.kind=='fp'});
+  if(!all.length){list.innerHTML='<div class="el">Nothing logged yet.<br>Use the tabs above to switch<br>between Puckouts and Frees/65s.</div>';return}
+  if(!shown.length){list.innerHTML='<div class="el">No entries for this filter yet.</div>';return}
+  list.innerHTML=shown.map(function(x){return x.kind=='po'?renderPO(x):renderFP(x)}).join('')
+}
+
+function renderPO(p){
+  var d=p.diff==0?'Level':(p.diff>0?'+':'')+p.diff;
+  var en=poEid==p.id;
+  var chain='';
+  if(p.t1act){
+    var parts=[];
+    if(p.t1act) parts.push((p.t1team||'?')+':'+p.t1act);
+    if(p.t2act) parts.push((p.t2team||'?')+':'+p.t2act);
+    if(p.t3act) parts.push((p.t3team||'?')+':'+p.t3act);
+    if(p.shot_out) parts.push('→'+p.shot_out);
+    chain=' <span style="color:var(--lime);font-size:.54rem;">⛓ '+parts.join(' · ')+'</span>';
+  }
+  var poOutIcon={'point':'⚡1','goal':'⚡3','no-score':'–','opp-point':'✗1','opp-goal':'✗3'}[p.poss_outcome]||'';
+  var poOutColour=p.poss_outcome==='point'?'var(--lime-bright)':p.poss_outcome==='goal'?'var(--gold)':p.poss_outcome==='no-score'?'var(--muted)':'var(--red)';
+  var poOutStr=poOutIcon?' <span style="color:'+poOutColour+'">'+poOutIcon+'</span>':'';
+  return '<div class="le ta-e'+(p.ptk=='B'?' tb-e':'')+(en?' en':'')+'" id="le-po-'+p.id+'" onclick="poStartEdit('+p.id+')"><div class="en_">#'+p.id+'</div><div class="ed"><div class="em"><span class="etag '+(p.ptk=='A'?'a':'b')+'">'+p.pucking_team.substring(0,9)+'</span> · '+(p.type||'?').toUpperCase()+' → '+p.zone+' · '+p.delivery+'</div><div class="es">min '+p.minute+' · '+p.spg+'-'+p.spp+' v '+p.sog+'-'+p.sop+' ('+d+') · '+p.action+poOutStr+chain+(p.notes?' · '+p.notes.substring(0,16):'')+'</div></div><div class="er '+p.retained+'">'+(p.retained=='yes'?'✓':p.retained=='no'?'✗':'?')+'</div><button class="db" onclick="delPO('+p.id+',event)">✕</button></div>'
+}
+
+function renderFP(f){
+  var d=f.diff==0?'Level':(f.diff>0?'+':'')+f.diff;
+  var en=fpEid==f.id;
+  var oi={point:'✓',goal:'⚽',wide:'✗',short:'✗',saved:'🛡',cleared:'🛡',retained:'✓',lost:'✗'}[f.outcome]||'?';
+  return '<div class="le fr-e'+(en?' en':'')+'" id="le-fp-'+f.id+'" onclick="fpStartEdit('+f.id+')"><div class="en_">F'+f.id+'</div><div class="ed"><div class="em"><span class="etag f">'+(f.spt||'?').toUpperCase()+'</span> · '+f.shooting_team.substring(0,9)+(f.shooter?' · '+f.shooter.substring(0,12):'')+' · '+f.zone+'</div><div class="es">min '+f.minute+' · '+f.ssg+'-'+f.ssp+' v '+f.sog+'-'+f.sop+' ('+d+') · '+f.attempt+' · '+f.pressure+(f.notes?' · '+f.notes.substring(0,18):'')+'</div></div><div class="er '+f.outcome+'">'+oi+'</div><button class="db" onclick="delFP('+f.id+',event)">✕</button></div>'
+}
+
+function delPO(id,e){e.stopPropagation();if(poEid==id)poCancel();puckouts=puckouts.filter(function(x){return x.id!=id});renderLog();updateStats()}
+function delFP(id,e){e.stopPropagation();if(fpEid==id)fpCancel();frees=frees.filter(function(x){return x.id!=id});renderLog();updateStats()}
+
+function retPct(arr){var k=arr.filter(function(p){return p.retained!='unknown'});return k.length?Math.round(k.filter(function(p){return p.retained=='yes'}).length/k.length*100):null}
+function convPct(arr){var k=arr.filter(function(f){return f.outcome!='unknown'});return k.length?Math.round(k.filter(function(f){return f.outcome=='point'||f.outcome=='goal'}).length/k.length*100):null}
+function updateStats(){
+  var r=retPct(puckouts),ra=retPct(puckouts.filter(function(p){return p.ptk=='A'})),rb=retPct(puckouts.filter(function(p){return p.ptk=='B'})),fc=convPct(frees);
+  document.getElementById('sAll').textContent=r!==null?r+'%':'—';
+  document.getElementById('sA').textContent=ra!==null?ra+'%':'—';
+  document.getElementById('sB').textContent=rb!==null?rb+'%':'—';
+  document.getElementById('sFP').textContent=fc!==null?fc+'%':'—';
+}
+
+function toast(msg,style){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+style;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},1300)}
+function pulse(id){var b=document.getElementById(id);b.classList.add('pulse');setTimeout(function(){b.classList.remove('pulse')},300)}
+
+function doExport(type){
+  if(type=='po'){
+    if(!puckouts.length){alert('No puckout data yet!');return}
+    var h=['id','match','date','team_a','team_b','pucking_team','half','minute','score_puck_goals','score_puck_points','score_opp_goals','score_opp_points','score_diff','type','delivery','target_zone','retained','next_action','poss_outcome','t1_team','t1_action','t2_team','t2_action','t3_team','t3_action','shot_outcome','notes'];
+    var rows=[...puckouts].reverse().map(function(p){return[p.id,p.match,p.date,p.team_a,p.team_b,p.pucking_team,p.half,p.minute,p.spg,p.spp,p.sog,p.sop,p.diff,p.type,p.delivery,p.zone,p.retained,p.action,p.poss_outcome,p.t1team,p.t1act,p.t2team,p.t2act,p.t3team,p.t3act,p.shot_out,p.notes].map(function(v){return'"'+(v??'')+'"'}).join(',')});
+    dl([h.join(',')].concat(rows).join('\n'),'puckouts');
+  } else {
+    if(!frees.length){alert('No frees/65s data yet!');return}
+    var h=['id','match','date','team_a','team_b','shooting_team','half','minute','score_shoot_goals','score_shoot_points','score_opp_goals','score_opp_points','score_diff','set_piece_type','shooter','position_zone','attempt_type','striking_side','under_pressure','outcome','notes'];
+    var rows=[...frees].reverse().map(function(f){return[f.id,f.match,f.date,f.team_a,f.team_b,f.shooting_team,f.half,f.minute,f.ssg,f.ssp,f.sog,f.sop,f.diff,f.spt,f.shooter,f.zone,f.attempt,f.side,f.pressure,f.outcome,f.notes].map(function(v){return'"'+(v??'')+'"'}).join(',')});
+    dl([h.join(',')].concat(rows).join('\n'),'frees');
+  }
+}
+
+function dl(csv,name){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name+'_'+(document.getElementById('mId').value||'match')+'_'+new Date().toISOString().slice(0,10)+'.csv';a.click()}
+
+document.addEventListener('keydown',function(e){
+  var tag=document.activeElement.tagName;
+  if(tag=='INPUT'||tag=='TEXTAREA')return;
+  var k=e.key.toLowerCase();
+  if(tab=='po'){
+    if(k=='q')document.querySelector('[data-v="C"]').click();
+    if(k=='w')document.querySelector('[data-v="P"]').click();
+    if(k=='e')document.querySelector('[data-v="T"]').click();
+    if(k=='r')document.querySelector('[data-v="B"]').click();
+    if(k=='f')document.querySelector('[data-v="X"]').click();
+    if(k=='y')poSR(true);if(k=='n')poSR(false);
+    if(k=='t')poSetTeam(poTeam=='A'?'B':'A');
+    if(k=='escape'&&poEid!==null)poCancel();
+    if(k==' '||k=='enter'){e.preventDefault();poHL()}
+  } else {
+    if(k=='1')document.querySelector('[data-v="free"]').click();
+    if(k=='2')document.querySelector('[data-v="65"]').click();
+    if(k=='3')document.querySelector('[data-v="sideline"]').click();
+    if(k=='q')document.querySelector('[data-v="direct"]').click();
+    if(k=='w'){var el=document.querySelector('[data-g="fpa"][data-v="goal"]');if(el)el.click()}
+    if(k=='e'){var el=document.querySelector('[data-g="fpa"][data-v="short"]');if(el)el.click()}
+    if(k=='r'){var el=document.querySelector('[data-g="fpa"][data-v="long"]');if(el)el.click()}
+    if(k=='a')document.querySelector('[data-v="dominant"]').click();
+    if(k=='s')document.querySelector('[data-v="non-dominant"]').click();
+    if(k=='p'){var el=document.querySelector('[data-v="rush"]');if(el)el.click()}
+    if(k=='z'){var el=document.querySelector('[data-g="fpo"][data-v="point"]');if(el)el.click()}
+    if(k=='x'){var el=document.querySelector('[data-g="fpo"][data-v="goal"]');if(el)el.click()}
+    if(k=='c'){var el=document.querySelector('[data-g="fpo"][data-v="wide"]');if(el)el.click()}
+    if(k=='v'){var el=document.querySelector('[data-g="fpo"][data-v="short"]');if(el)el.click()}
+    if(k=='b'){var el=document.querySelector('[data-g="fpo"][data-v="saved"]');if(el)el.click()}
+    if(k=='m'){var el=document.querySelector('[data-g="fpo"][data-v="cleared"]');if(el)el.click()}
+    if(k=='n'){var el=document.querySelector('[data-g="fpo"][data-v="retained"]');if(el)el.click()}
+    if(k==','){var el=document.querySelector('[data-g="fpo"][data-v="lost"]');if(el)el.click()}    if(k=='t')fpSetTeam(fpTeam=='A'?'B':'A');
+    if(k=='escape'&&fpEid!==null)fpCancel();
+    if(k==' '||k=='enter'){e.preventDefault();fpHL()}
+  }
+});
+</script>
+</body>
+</html>
