@@ -1,0 +1,74 @@
+id,match,date,team_a,team_b,pucking_team,half,minute,score_puck_goals,score_puck_points,score_opp_goals,score_opp_points,score_diff,type,delivery,target_zone,retained,next_action,poss_outcome,t1_team,t1_action,t2_team,t2_action,t3_team,t3_action,shot_outcome,notes,has_chain,chain_length,match_label,opposition,goalkeeper,retained_bool,game_state,net_score_value,outcome_logged
+1,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,1.0,0,0,0,1,-1,long,T,AL,no,turnover,no-score,A,turnover,B,pass,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,False,Losing 1-3,0,True
+2,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,3.0,0,1,0,1,0,long,C,AC,yes,pass,point,A,foul-won,A,shot,n/a,n/a,point,,True,2,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Level,1,True
+3,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,4.0,0,1,0,2,-1,long,B,AR,no,turnover,no-score,A,pass,A,turnover,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,False,Losing 1-3,0,True
+4,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,4.0,0,2,0,1,1,long,unknown,AR,yes,pass,no-score,A,turnover,B,pass,B,turnover,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+5,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,5.0,0,1,0,2,-1,long,C,AR,yes,shot,no-score,,,,,,,wide,,False,0,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,0,True
+6,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,6.0,0,2,0,1,1,long,B,AC,no,turnover,point,B,pass,B,carry,B,shot,point,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 1-3,1,True
+7,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,7.0,0,2,0,2,0,long,P,AC,yes,carry,no-score,A,pass,A,turnover,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Level,0,True
+8,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,7.0,0,2,0,2,0,short,C,DC,yes,carry,no-score,A,pass,A,pass,A,shot,wide,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Level,0,True
+9,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,7.0,0,2,0,2,0,short,C,DR,yes,launch,no-score,B,shot,n/a,n/a,n/a,n/a,short,,True,1,2025_AIHF_CORK_TIPP,Cork,unknown,True,Level,0,True
+10,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,8.0,0,2,0,3,-1,short,C,DC,yes,carry,no-score,B,carry,B,pass,B,shot,wide,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,0,True
+11,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,9.0,0,3,0,2,1,short,C,DR,yes,carry,no-score,A,pass,A,launch,A,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+12,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,10.0,0,2,0,4,-2,medium,B,ML,yes,carry,point,B,launch,B,foul-won,B,shot,point,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,1,True
+13,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,11.0,0,4,0,3,1,long,X,AR,no,turnover,no-score,B,carry,B,shot,n/a,n/a,wide,,True,2,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 1-3,0,True
+14,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,12.0,0,4,0,3,1,short,C,DC,yes,carry,no-score,A,pass,A,carry,A,shot,wide,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+15,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,12.0,0,3,0,4,-1,short,C,DC,yes,launch,point,B,shot,n/a,n/a,n/a,n/a,point,,True,1,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,1,True
+16,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,13.0,0,4,0,4,0,short,C,DC,yes,carry,point,A,foul-won,A,launch,A,carry,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Level,1,True
+17,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,14.0,0,4,0,5,-1,long,C,AR,yes,shot,no-score,,,,,,,wide,,False,0,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,0,True
+18,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,15.0,0,5,0,4,1,medium,C,MR,yes,pass,point,A,pass,A,pass,A,shot,point,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,1,True
+19,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,15.0,0,4,0,6,-2,long,C,AL,yes,pass,point,A,pass,A,pass,A,foul-won,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,1,True
+20,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,17.0,0,6,0,5,1,long,B,AL,no,turnover,point,B,carry,B,pass,B,turnover,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 1-3,1,True
+21,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,17.0,0,5,0,7,-2,long,X,AL,no,turnover,no-score,A,pass,A,pass,A,launch,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,False,Losing 1-3,0,True
+22,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,19.0,0,7,0,6,1,short,C,DC,yes,pass,point,A,launch,A,foul-won,A,shot,point,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,1,True
+23,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,21.0,0,8,0,6,2,short,C,DC,yes,pass,no-score,A,launch,A,turnover,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+24,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,21.0,0,6,0,9,-3,long,C,AR,yes,carry,point,B,shot,n/a,n/a,n/a,n/a,point,,True,1,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,1,True
+25,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,22.0,0,9,0,7,2,short,C,DL,yes,launch,no-score,A,turnover,B,pass,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+26,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,23.0,0,7,0,10,-3,short,C,DC,yes,pass,opp-point,B,turnover,A,carry,A,pass,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,-1,True
+27,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,23.0,0,7,0,11,-4,long,T,AL,no,turnover,no-score,A,pass,A,carry,A,turnover,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,False,Losing 4+,0,True
+28,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,24.0,0,11,0,8,3,long,B,AR,yes,carry,point,A,pass,A,pass,A,foul-won,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,1,True
+29,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,25.0,0,8,0,12,-4,short,C,DC,yes,carry,no-score,B,pass,B,pass,B,launch,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 4+,0,True
+30,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,26.0,0,8,0,13,-5,medium,C,MR,yes,carry,point,B,pass,B,foul-won,B,shot,point,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 4+,1,True
+31,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,28.0,0,13,0,9,4,short,C,DL,yes,launch,opp-point,A,turnover,B,pass,A,carry,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 4+,-1,True
+32,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,28.0,0,13,0,10,3,long,B,AC,yes,carry,point,A,shot,n/a,n/a,n/a,n/a,point,,True,1,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,1,True
+33,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,29.0,0,10,0,14,-4,short,C,DR,yes,pass,point,B,pass,B,carry,B,shot,point,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 4+,1,True
+34,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,29.0,0,14,0,11,3,long,T,AC,no,carry,no-score,B,launch,B,turnover,A,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 1-3,0,True
+35,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,30.0,0,11,0,15,-4,short,C,DL,yes,pass,no-score,B,launch,B,pass,B,shot,wide,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 4+,0,True
+36,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,30.0,0,15,0,11,4,short,C,DL,yes,pass,point,A,carry,A,shot,n/a,n/a,point,,True,2,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 4+,1,True
+37,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,31.0,0,11,0,16,-5,short,C,DL,yes,pass,no-score,B,carry,B,launch,B,carry,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 4+,0,True
+38,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,33.0,0,16,0,12,4,long,B,AL,no,turnover,no-score,B,foul-won,B,shot,n/a,n/a,short,,True,2,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 4+,0,True
+39,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,35.0,0,12,0,16,-4,short,C,DC,yes,pass,no-score,B,launch,B,turnover,A,carry,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 4+,0,True
+40,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,36.0,0,16,0,12,4,medium,C,MC,yes,carry,opp-point,A,pass,A,turnover,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 4+,-1,True
+41,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,37.0,0,16,0,13,3,short,C,DC,yes,launch,no-score,A,shot,n/a,n/a,n/a,n/a,wide,,True,1,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+42,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,37.0,0,13,0,16,-3,short,C,DC,yes,launch,goal,B,turnover,A,carry,A,pass,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,3,True
+43,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,1,,0,6,0,8,-2,long,C,AL,yes,pass,no-score,B,pass,B,carry,B,shot,wide,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 1-3,0,True
+44,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,1,,1,17,2,22,-8,long,B,AL,yes,pass,no-score,A,turnover,B,carry,A,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Losing 4+,0,True
+45,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,2,37.0,0,13,1,16,-6,long,P,AL,yes,carry,point,B,pass,B,carry,B,shot,point,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Losing 4+,1,True
+46,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,37.0,1,16,0,14,5,long,T,AR,no,turnover,opp-point,B,pass,B,pass,B,carry,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 4+,-1,True
+47,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,38.0,1,16,0,15,4,short,C,DL,yes,pass,no-score,A,launch,A,turnover,B,foul-won,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 4+,0,True
+48,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,40.0,1,16,0,16,3,medium,C,MR,yes,pass,no-score,A,pass,A,shot,n/a,n/a,wide,,True,2,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+49,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,41.0,1,16,0,16,3,medium,C,ML,yes,pass,no-score,A,turnover,B,pass,B,carry,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+50,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,42.0,1,16,0,17,2,long,T,AC,no,turnover,no-score,B,pass,B,pass,B,carry,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 1-3,0,True
+51,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,42.0,1,16,0,17,2,medium,T,MC,no,turnover,opp-point,B,carry,B,foul-won,B,shot,point,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 1-3,-1,True
+52,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,44.0,1,16,0,18,1,long,B,AL,no,turnover,no-score,B,carry,B,pass,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Winning 1-3,0,True
+53,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,45.0,1,16,0,18,1,short,C,DL,yes,launch,no-score,,,,,,,,,False,0,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Winning 1-3,0,True
+54,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,46.0,1,16,1,18,-2,long,B,AC,yes,carry,point,A,shot,n/a,n/a,n/a,n/a,point,,True,1,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Losing 1-3,1,True
+55,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,2,48.0,1,18,1,17,1,long,C,AL,yes,carry,no-score,B,shot,n/a,n/a,n/a,n/a,wide,,True,1,2025_AIHF_CORK_TIPP,Cork,unknown,True,Winning 1-3,0,True
+56,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,48.0,1,17,1,18,-1,short,C,DC,yes,pass,no-score,A,pass,A,pass,A,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Losing 1-3,0,True
+57,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,2,49.0,1,18,1,17,1,long,B,AC,no,turnover,point,A,carry,A,turnover,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,False,Winning 1-3,1,True
+58,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,50.0,1,17,1,19,-2,long,P,AL,yes,pass,no-score,A,pass,A,shot,n/a,n/a,wide,,True,2,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Losing 1-3,0,True
+59,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,2,51.0,1,19,1,17,2,long,B,AR,no,turnover,no-score,A,pass,A,pass,A,turnover,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,False,Winning 1-3,0,True
+60,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,53.0,1,17,1,20,-3,long,B,AL,yes,carry,no-score,A,pass,A,turnover,B,carry,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Losing 1-3,0,True
+61,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,55.0,1,17,2,20,-6,long,T,AC,no,turnover,no-score,B,launch,B,turnover,A,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Losing 4+,0,True
+62,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,57.0,1,17,2,21,-7,long,P,AL,yes,pass,no-score,A,launch,A,turnover,B,foul-won,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Losing 4+,0,True
+63,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,2,58.0,2,21,1,17,7,short,C,DC,yes,launch,point,B,turnover,A,turnover,B,foul-won,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Winning 4+,1,True
+64,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,61.0,1,17,3,22,-11,long,B,AC,no,turnover,opp-point,B,pass,B,pass,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Losing 4+,-1,True
+65,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,61.0,1,17,3,23,-12,long,P,AL,yes,carry,no-score,A,carry,A,shot,n/a,n/a,wide,,True,2,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Losing 4+,0,True
+66,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,2,62.0,3,23,1,17,12,short,C,DC,yes,launch,no-score,B,turnover,A,pass,A,pass,,,True,3,2025_AIHF_CORK_TIPP,Cork,unknown,True,Winning 4+,0,True
+67,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,65.0,1,17,3,23,-12,short,C,DL,yes,launch,no-score,A,turnover,B,pass,B,pass,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,True,Losing 4+,0,True
+68,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Tipperary,2,66.0,3,23,1,18,11,long,X,AL,no,turnover,no-score,,,,,,,,,False,0,2025_AIHF_CORK_TIPP,Cork,unknown,False,Winning 4+,0,True
+69,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,68.0,1,18,3,24,-12,long,B,AL,no,foul-won,no-score,,,,,,,,,False,0,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Losing 4+,0,True
+70,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,69.0,1,18,3,25,-13,long,X,AL,no,unknown,no-score,,,,,,,,,False,0,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Losing 4+,0,True
+71,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,73.0,1,18,3,25,-13,long,T,AL,no,turnover,opp-point,B,pass,B,carry,B,foul-won,,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Losing 4+,-1,True
+72,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,74.0,1,18,3,26,-14,long,B,AL,no,turnover,opp-point,B,pass,B,pass,B,shot,point,,True,3,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Losing 4+,-1,True
+73,2025_AIHF_CORK_TIPP,2025-07-20,Cork,Tipperary,Cork,2,75.0,1,18,3,27,-15,long,X,AR,no,unknown,no-score,,,,,,,,,False,0,2025_AIHF_CORK_TIPP,Tipperary,unknown,False,Losing 4+,0,True
